@@ -61,6 +61,28 @@ def break_compound_furigana(expr: str) -> str:
     return result_expr
 
 
+def break_compound_furigana_ruby(expr: str) -> str:
+    furigana_start = expr.find('[')
+    if p := traverse(expr, furigana_start):
+        result_expr = f"{expr[:p.out_start]}{expr[furigana_start:p.in_start]}]{expr[p.out_start:p.out_end]} "
+        result_expr = replace_with_ruby(result_expr)
+        result_expr += break_compound_furigana_ruby(f"{expr[p.out_end:furigana_start]}[{expr[p.in_end:]}")
+    else:
+        result_expr = replace_with_ruby(expr)
+    return result_expr
+
+
+def replace_with_ruby(expr: str) -> str:
+    '''
+    私[わたし] --> <ruby><rb>私</rb><rt>わたし</rt></ruby>
+    '''
+    expr = expr.strip()
+    beging = expr.find('[')
+    end = expr.find(']')
+    expr = '<ruby>'+'<rb>'+expr[:beging]+'</rb>'+'<rt>'+expr[beging+1:end]+'</rt>'+'</ruby>'+expr[end+1:]
+    return expr
+
+
 if __name__ == "__main__":
     print(break_compound_furigana('取って置[とってお]き'))
     print(break_compound_furigana('言い方[いいかた]'))
