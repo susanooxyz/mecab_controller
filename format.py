@@ -9,7 +9,7 @@ except ImportError:
     from kana_conv import to_katakana as _
 
 
-def iskanji(jp_char, furigana):
+def iskanji(jp_char: str, furigana: str) -> bool:
     return _(jp_char) != _(furigana)
 
 
